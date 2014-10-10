@@ -71,7 +71,7 @@ func SMSHandler(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			twiml = fmt.Sprintf("<Response><Message>%s</Message></Response>", err.Error())
 		} else {
-			twiml = "<Response><Message>Thank you for your feedback</Message></Response>"
+			twiml = "<Response><Message>Thank you for your feedback. Enjoy the rest of #CSSDevConf!</Message></Response>"
 
 			comment := fmt.Sprintf("'%s'", segments[2])
 
@@ -95,7 +95,7 @@ func SMSHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 	} else {
-		twiml = `<Response><Message>Your Message was not formatted properly</Message></Response>`
+		twiml = `<Response><Message>Your Message was not formatted properly. Sad trombone.</Message></Response>`
 
 	}
 
