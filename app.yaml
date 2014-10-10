@@ -9,8 +9,9 @@ handlers:
   static_files: site/index.html
   upload: site/index.html
 
+- url: /(report|sms)$
+  script: _go_app
+
 - url: /
   static_dir: site
 
-- url: /.*
-  script: _go_app
