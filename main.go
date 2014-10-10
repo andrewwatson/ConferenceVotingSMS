@@ -13,9 +13,10 @@ import (
 )
 
 type VoteStorage struct {
-	Hashtag string
-	Rating  int
-	Comment string
+	PhoneNumber string
+	Hashtag     string
+	Rating      int
+	Comment     string
 }
 
 // Because App Engine owns main and starts the HTTP service,
@@ -46,7 +47,7 @@ func ReportHandler(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Add("Content-type", "text/plain")
 
 	for _, vote := range Votes {
-		rw.Write([]byte(fmt.Sprintf("%s,%d,%s\n", vote.Hashtag, vote.Rating, vote.Comment)))
+		rw.Write([]byte(fmt.Sprintf("%s, %s,%d,%s\n", vote.PhoneNumber, vote.Hashtag, vote.Rating, vote.Comment)))
 	}
 
 }
@@ -81,7 +82,8 @@ func SMSHandler(rw http.ResponseWriter, req *http.Request) {
 
 			} else {
 
-				v := VoteStorage{segments[0], voteValue, comment}
+				phoneNumber := req.PostFormValue("From")
+				v := VoteStorage{phoneNumber, segments[0], voteValue, comment}
 				_, err = datastore.Put(c, datastore.NewIncompleteKey(c, "vote", nil), &v)
 
 				if err != nil {
