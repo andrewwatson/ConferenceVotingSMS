@@ -2,5 +2,5 @@ test:
   override:
     - mkdir -p ~/.go_workspace/src/appengine/datastore
     - mkdir ~/.go_workspace/src/appengine/context
-  	- go get github.com/gorilla/mux
+    - go get github.com/gorilla/mux
     - go test validate.go validate_test.go
