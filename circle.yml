@@ -1,3 +1,6 @@
+dependencies: 
+  override: 
+    - echo "do nothing here"
 test:
   override:
     - mkdir -p ~/.go_workspace/src/appengine/datastore
