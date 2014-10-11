@@ -7,14 +7,6 @@ dependencies:
 
 test:
   override:
-    - mkdir -p ~/.go_workspace/src/appengine/datastore
-    - mkdir ~/.go_workspace/src/appengine/context
-    - go get github.com/gorilla/mux
-    - go get github.com/stretchr/testify
-    - go test validate.go validate_test.go
+    - go test
 
-deployment:
-  appengine:
-    branch: master
-    commands:
-    - $HOME/go_appengine/appcfg.py --oauth2 update .
+d
