@@ -1,6 +1,6 @@
 machine:
   environment:
-    GOPATH: $HOME/go_appengine/goroot
+    GOROOT: $HOME/go_appengine/goroot
 
 dependencies: 
   pre:
