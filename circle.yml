@@ -6,5 +6,5 @@ dependencies:
 test:
   override:
     - go test
-    	environment:
-    	  GOPATH: $GOPATH:$HOME/go_appengine/goroot/src/pkg
+        environment:
+          GOPATH: $GOPATH:$HOME/go_appengine/goroot/src/pkg
