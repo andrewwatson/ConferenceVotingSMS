@@ -17,4 +17,4 @@ deployment:
   appengine:
     branch: master
     commands:
-    - $HOME/google_appengine/appcfg.py --oauth2 update .
+    - $HOME/go_appengine/appcfg.py --oauth2 update .
