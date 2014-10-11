@@ -1,6 +1,6 @@
 machine:
   environment:
-    GOPATH: $HOME/go_appengine/goroot/src/pkg
+    GOPATH: $HOME/go_appengine/goroot
 
 dependencies: 
   pre:
