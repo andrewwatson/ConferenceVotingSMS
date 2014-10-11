@@ -10,3 +10,7 @@ dependencies:
 test:
   override:
     - go test
+
+build:
+  override:
+    - echo "nope"
