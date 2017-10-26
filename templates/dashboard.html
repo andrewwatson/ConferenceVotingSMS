@@ -1,0 +1,59 @@
+{{define "dashboard"}}
+
+    {{ template "head" .}}
+  <body>
+
+    {{ template "nav" .}}
+    <main role="main">
+
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <div class="container">
+          <h1 class="display-3">RateConf</h1>
+          <p>It's never been easier to quickly and easily find out what your conference 
+              participants think of the sessions they're attending.</p>
+          <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn More &raquo;</a></p>
+        </div>
+      </div>
+
+      <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+          <div class="col-md-4">
+            <h2>Simple</h2>
+            <p>Participants just send simple text messages to rate their sessions and give feedback</p>
+            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+          </div>
+          <div class="col-md-4">
+            <h2>Easy</h2>
+            <p>You get results in an easy to use dashboard and you can download a spreadsheet of all your results</p>
+            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+          </div>
+          <div class="col-md-4">
+            <h2>Affordable</h2>
+            <p>Plans start at only $100 per conference session!</p>
+            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+          </div>
+        </div>
+
+        <hr>
+
+      </div> <!-- /container -->
+
+    </main>
+
+    <footer class="container">
+      <p>&copy; RateConf {{.Year}}</p>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="/assets/js/   jquery.min.js"><\/script>')</script>
+    <script src="/assets/js/vendor/popper.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
+{{end}}

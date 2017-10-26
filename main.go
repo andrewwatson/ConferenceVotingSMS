@@ -9,15 +9,17 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"google.golang.org/appengine/user"
 
-	"appengine"
-	"appengine/datastore"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 
 	"strings"
 )
 
 var (
-	templates *template.Template
+	templates    *template.Template
+	featureFlags map[string]bool
 )
 
 type VoteStorage struct {
@@ -26,6 +28,18 @@ type VoteStorage struct {
 	Rating      int
 	Comment     string
 }
+type contextKey int
+
+const (
+	contextFlagFeatureFlags contextKey = 0
+	contextFlagBitlyAgent   contextKey = 1
+	contextFlagHost         contextKey = 2
+	contextFlagCSPNonce     contextKey = 3
+	featureFlagCSRF                    = "FEATUREFLAG_CSRF"
+	featureFlagNamespace               = "FEATUREFLAG_NAMESPACE"
+	defaultHostName                    = ""
+	defaultTimeZone                    = "America/New_York"
+)
 
 // Because App Engine owns main and starts the HTTP service,
 // we do our setup during initialization.
@@ -48,19 +62,17 @@ func init() {
 	// Serve up static assets directly
 	r.PathPrefix("/assets").Handler(http.FileServer(http.Dir(".")))
 
-	r.HandleFunc("/", HomeHandler)
+	r.HandleFunc("/", homeHandler)
 
-	r.Path("/h").Methods("GET").HandlerFunc(HomeHandler)
-	r.Path("/sms").Methods("POST").HandlerFunc(SMSHandler)
-	r.Path("/report").Methods("GET").HandlerFunc(ReportHandler)
-
-	// r.NotFoundHandler = http.NotFoundHandler()
+	r.Path("/sms").Methods("POST").HandlerFunc(messageHandler)
+	r.Path("/report").Methods("GET").HandlerFunc(reportHandler)
+	r.NotFoundHandler = http.NotFoundHandler()
 
 	http.Handle("/", r)
 }
 
 // ReportHandler generates the CSV file output
-func ReportHandler(rw http.ResponseWriter, req *http.Request) {
+func reportHandler(rw http.ResponseWriter, req *http.Request) {
 	c := appengine.NewContext(req)
 
 	var Votes []VoteStorage
@@ -80,7 +92,7 @@ func ReportHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 // SMSHandler processes incoming messages
-func SMSHandler(rw http.ResponseWriter, req *http.Request) {
+func messageHandler(rw http.ResponseWriter, req *http.Request) {
 
 	c := appengine.NewContext(req)
 
@@ -131,7 +143,7 @@ func SMSHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 // HomeHandler is the home page
-func HomeHandler(rw http.ResponseWriter, r *http.Request) {
+func homeHandler(rw http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Title    string
@@ -148,6 +160,25 @@ func HomeHandler(rw http.ResponseWriter, r *http.Request) {
 		handleError(rw, r, err)
 		return
 	}
+}
+
+func dashHandler(rw http.ResponseWriter, r *http.Request) {
+	if requireAuthentication(rw, r) != nil {
+		return
+	}
+
+}
+
+func requireAuthentication(rw http.ResponseWriter, r *http.Request) *user.User {
+	ctx := appengine.NewContext(r)
+	u := user.Current(ctx)
+	if u == nil {
+		url, _ := user.LoginURL(ctx, "/")
+		http.Redirect(rw, r, url, http.StatusTemporaryRedirect)
+		return nil
+	}
+
+	return u
 }
 
 func truncateString(input string, length int) (string, error) {
