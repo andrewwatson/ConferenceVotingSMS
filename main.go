@@ -1,15 +1,23 @@
 package voteconf
 
 import (
-	// "fmt"
+	"fmt"
+	"html"
+	"html/template"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/gorilla/mux"
-	// "html"
+
 	"appengine"
 	"appengine/datastore"
-	"fmt"
-	"net/http"
 
 	"strings"
+)
+
+var (
+	templates *template.Template
 )
 
 type VoteStorage struct {
@@ -23,16 +31,35 @@ type VoteStorage struct {
 // we do our setup during initialization.
 func init() {
 
+	funcMap := template.FuncMap{
+
+		"Title":       strings.Title,
+		"Shorten":     truncateString,
+		"Unescape":    html.UnescapeString,
+		"StringInt":   strconv.Itoa,
+		"StringInt64": strconv.FormatInt,
+	}
+	// Preload all the templates at startup time instead of in each handler function
+	// All templates must start with a {{define "name"}} block and end with {{end}}
+	templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
+
 	r := mux.NewRouter()
 
-	// r.HandleFunc("/", HomeHandler)
+	// Serve up static assets directly
+	r.PathPrefix("/assets").Handler(http.FileServer(http.Dir(".")))
+
+	r.HandleFunc("/", HomeHandler)
+
+	r.Path("/h").Methods("GET").HandlerFunc(HomeHandler)
 	r.Path("/sms").Methods("POST").HandlerFunc(SMSHandler)
 	r.Path("/report").Methods("GET").HandlerFunc(ReportHandler)
 
-	r.Path("")
+	// r.NotFoundHandler = http.NotFoundHandler()
+
 	http.Handle("/", r)
 }
 
+// ReportHandler generates the CSV file output
 func ReportHandler(rw http.ResponseWriter, req *http.Request) {
 	c := appengine.NewContext(req)
 
@@ -52,6 +79,7 @@ func ReportHandler(rw http.ResponseWriter, req *http.Request) {
 
 }
 
+// SMSHandler processes incoming messages
 func SMSHandler(rw http.ResponseWriter, req *http.Request) {
 
 	c := appengine.NewContext(req)
@@ -100,4 +128,36 @@ func SMSHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	rw.Write([]byte(twiml))
+}
+
+// HomeHandler is the home page
+func HomeHandler(rw http.ResponseWriter, r *http.Request) {
+
+	data := struct {
+		Title    string
+		Subtitle string
+		Year     int
+	}{
+		"Conference Session Rater",
+		"Welcome Screen",
+		time.Now().Year(),
+	}
+
+	err := templates.ExecuteTemplate(rw, "main", &data)
+	if err != nil {
+		handleError(rw, r, err)
+		return
+	}
+}
+
+func truncateString(input string, length int) (string, error) {
+
+	inputLength := len(input)
+
+	shorter := input
+	if inputLength > length-1 {
+		shorter = string([]byte(input)[0:length]) + "..."
+	}
+
+	return shorter, nil
 }
